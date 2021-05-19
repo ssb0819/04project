@@ -72,7 +72,6 @@ public class ProductServiceTest {
 		search.setSearchKeyword("a");
 		search.setSearchPriceMin(1000);
 		search.setSearchPriceMax(5000);
-		search.setSearchKeyword("testProduct");
 		
 		Map<String, Object> map = productService.getProductList(search);
 		List<Product> list = (List<Product>)map.get("list");

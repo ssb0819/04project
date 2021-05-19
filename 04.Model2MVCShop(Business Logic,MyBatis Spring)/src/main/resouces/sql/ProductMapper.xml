@@ -14,6 +14,7 @@
 		<result property="prodName" column="prod_name" jdbcType="VARCHAR"/>
 		<result property="prodNo" column="prod_no" jdbcType="NUMERIC"/>
 		<result property="regDate" column="reg_date" jdbcType="DATE"/>
+		<result property="proTranCode" column="tran_status_code" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<insert id="insertProduct" parameterType="product">
@@ -39,18 +40,17 @@
 	
 	<select id="getProductList" parameterType="search" resultMap="productSelectMap">				
 		SELECT 
-		prod_no, prod_name, prod_detail, manufacture_day, price, image_file, reg_date 
-		FROM ( SELECT inner_table. * ,  ROWNUM AS row_seq
-				FROM (			
-						SELECT * 
+		prod_no, prod_name, price, prod_detail, tran_status_code, row_seq
+		FROM ( SELECT inner_table.prod_no, inner_table.prod_name, inner_table.price, inner_table.prod_detail,inner_table.tran_status_code,  ROWNUM AS row_seq
+				FROM ( SELECT p.prod_no, p.prod_name, p.price, p.prod_detail, t.tran_status_code
 						FROM product p, transaction t
 						<where> 
-							p.prod_no = t.prod_no(+) AND p.prod_name LIKE '%'||#{searchKeyword}||'%'
+							p.prod_no = t.prod_no(+) AND p.prod_name LIKE '%${searchKeyword}%'
 							<if test="searchPriceMin>0">
-								AND p.price %gt;= #{searchPriceMin}
+								AND p.price >= #{searchPriceMin}
 							</if>
 							<if test="searchPriceMax>0">
-								AND p.price %lt;= #{searchPriceMax}
+								AND p.price <![CDATA[<= ]]> #{searchPriceMax}
 							</if>
 						</where>
 						ORDER BY t.tran_status_code NULLS FIRST, p.prod_no DESC		
@@ -72,10 +72,10 @@
 						<where> 
 							p.prod_no = t.prod_no(+) AND p.prod_name LIKE #{searchKeyword}
 							<if test="searchPriceMin>0">
-								AND p.price %gt;= #{searchPriceMin}
+								AND p.price <![CDATA[>= ]]> #{searchPriceMin}
 							</if>
 							<if test="searchPriceMax>0">
-								AND p.price %lt;= #{searchPriceMax}
+								AND p.price <![CDATA[<= ]]> #{searchPriceMax}
 							</if>
 						</where>
 						ORDER BY t.tran_status_code NULLS FIRST, p.prod_no DESC ) countTable						
